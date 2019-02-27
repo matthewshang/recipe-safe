@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'recipe-entry',
+  name: 'RecipeEntry',
   data() {
     return {
       entry: {

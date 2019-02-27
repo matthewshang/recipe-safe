@@ -6,7 +6,7 @@
       v-for="(entry, index) in entries"
       :key="entry.slug + '_' + index">
       
-      <router-link :to="'/' + entry.slug">
+      <router-link :to="'/entries/' + entry.slug">
         <h2>{{ entry.name }}</h2>
       </router-link>
     </div>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  name: 'recipe-home',
+  name: 'RecipeHome',
   data() {
     return {
       page_title: 'Home',
