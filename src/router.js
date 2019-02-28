@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import RecipeHome from './views/RecipeHome.vue'
-import RecipeEntry from './views/RecipeEntry.vue'
-import RecipeAbout from './views/RecipeAbout.vue'
+import Home from './views/Home.vue'
+import Entry from './views/Entry.vue'
+import About from './views/About.vue'
 import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
@@ -13,23 +13,26 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'RecipeHome',
-      component: RecipeHome
+      name: 'Home',
+      component: Home
     },
     {
       path: '/about',
-      name: 'RecipeAbout',
-      component: RecipeAbout
+      name: 'About',
+      component: About
     },
     {
       path: '/entries/:slug',
-      name: 'RecipeEntry',
-      component: RecipeEntry
+      name: 'Entry',
+      component: Entry
+    },
+    {
+      path: '/404',
+      component: NotFound
     },
     {
       path: '*',
-      name: 'NotFound',
-      component: NotFound
+      redirect: '/404'
     }
   ]
 })

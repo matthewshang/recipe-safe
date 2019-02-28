@@ -1,5 +1,5 @@
 <template>
-  <b-navbar>
+  <b-navbar> 
     <b-navbar-brand :to="{ path: '/' }">RecipeSafe</b-navbar-brand>
     <b-navbar-nav>
       <b-nav-item :to="{ path: '/about' }">About</b-nav-item>
@@ -14,5 +14,4 @@ export default {
 </script>
 
 <style>
-
 </style>

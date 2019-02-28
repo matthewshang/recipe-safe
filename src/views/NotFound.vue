@@ -11,5 +11,9 @@ export default {
 </script>
 
 <style>
-
+p {
+  font-weight: bold;
+  font-size: 20pt;
+  text-align: center;
+}
 </style>
