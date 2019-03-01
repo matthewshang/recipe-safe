@@ -2,7 +2,6 @@
   <div id="app">
     <base-nav-bar></base-nav-bar>
     <router-view/>
-    <b-button class="mx-2" @click="greet" :pressed.sync="myToggle">Toggle</b-button>
   </div>
 </template>
 
