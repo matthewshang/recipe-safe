@@ -43,7 +43,7 @@ export default {
       if (slug in entries) {
         this.entry = entries[slug]
       } else {
-        this.$router.push('/404')
+        this.$router.push('/notfound')
       }
     }
   }

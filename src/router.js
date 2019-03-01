@@ -27,12 +27,12 @@ export default new Router({
       component: Entry
     },
     {
-      path: '/404',
+      path: '/notfound',
       component: NotFound
     },
     {
       path: '*',
-      redirect: '/404'
+      redirect: '/notfound'
     }
   ]
 })
