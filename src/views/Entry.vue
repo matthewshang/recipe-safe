@@ -35,6 +35,9 @@ export default {
         },
         'dumplings': {
           name: 'Dumplings'
+        },
+        'pizza': {
+          name: 'Pizza'
         }
       }
 
@@ -43,7 +46,7 @@ export default {
       if (slug in entries) {
         this.entry = entries[slug]
       } else {
-        this.$router.push('/notfound')
+        this.$router.push('/not-found')
       }
     }
   }

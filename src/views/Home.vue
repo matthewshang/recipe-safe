@@ -7,17 +7,9 @@
         <b-col
           v-for="(entry, index) in entries"
           :key="entry.slug + '_' + index"
-          class="col-xs-4"
+          class="m-0 col-xs-4"
         >
-          <b-card
-            :title="entry.name"
-            class="home-grid-card"
-          >
-            <b-card-text>
-              Some quick example
-            </b-card-text>
-
-          </b-card>
+          <home-recipe-card :entry=entry></home-recipe-card>
         </b-col>
       </b-row>
     </b-container>
@@ -25,8 +17,12 @@
 </template>
 
 <script>
+import HomeRecipeCard from '../components/HomeRecipeCard.vue'
 export default {
   name: "Home",
+  components: {
+    'home-recipe-card': HomeRecipeCard
+  },
   data() {
     return {
       page_title: "Home",
@@ -55,7 +51,4 @@ export default {
 </script>
 
 <style>
-.home-grid-card {
-  text-align: center;
-}
 </style>
