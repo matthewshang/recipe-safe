@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import Api from '../api.js'
+
 export default {
   name: 'Entry',
   data () {
@@ -29,25 +31,16 @@ export default {
       this.entry = null
       this.loading = true
 
-      const entries = {
-        'fried-rice': {
-          name: 'Fried Rice'
-        },
-        'dumplings': {
-          name: 'Dumplings'
-        },
-        'pizza': {
-          name: 'Pizza'
-        }
-      }
-
       const slug = this.$route.params.slug
       this.loading = false
-      if (slug in entries) {
-        this.entry = entries[slug]
-      } else {
-        this.$router.replace('/not-found')
-      }
+      Api.get('entries/' + slug)
+        .then((res) => {
+          this.entry = res.data
+        })
+        .catch((err) => {
+          console.log(err)
+          this.$router.replace('/not-found')
+        })
     }
   }
 };
