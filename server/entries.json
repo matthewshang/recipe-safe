@@ -11,6 +11,22 @@
         {
             "name": "Pizza",
             "slug": "pizza"
+        },
+        {
+            "name": "Cheese",
+            "slug": "cheese"
+        },
+        {
+            "name": "Grapes",
+            "slug": "grapes"
+        },
+        {
+            "name": "Cheesecake",
+            "slug": "cheesecake"
+        },
+        {
+            "name": "Pecan Pie",
+            "slug": "pecan-pie"
         }
     ]
 }
