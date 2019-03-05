@@ -1,0 +1,16 @@
+{
+    "entries": [
+        {
+            "name": "Fried Rice",
+            "slug": "fried-rice"
+        },
+        {
+            "name": "Dumplings",
+            "slug": "dumplings"
+        },
+        {
+            "name": "Pizza",
+            "slug": "pizza"
+        }
+    ]
+}

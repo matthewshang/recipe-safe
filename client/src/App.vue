@@ -14,9 +14,6 @@
       }
     },
     methods: {
-      greet: function (event) {
-        alert(`Hello ${this.myToggle}!`)
-      }
     },
     components: {
       'base-nav-bar': BaseNavBar

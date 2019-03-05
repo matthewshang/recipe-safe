@@ -17,7 +17,9 @@
 </template>
 
 <script>
+import Api from '../api.js'
 import HomeRecipeCard from '../components/HomeRecipeCard.vue'
+
 export default {
   name: "Home",
   components: {
@@ -26,21 +28,13 @@ export default {
   data() {
     return {
       page_title: "Home",
-      entries: [
-        {
-          name: "Fried Rice",
-          slug: "fried-rice"
-        },
-        {
-          name: "Dumplings",
-          slug: "dumplings"
-        },
-        {
-          name: "Pizza",
-          slug: "pizza"
-        }
-      ]
-    };
+      entries: null
+    }
+  },
+  created () {
+    Api
+      .get('entries')
+      .then(res => (this.entries = res.data))
   },
   methods: {
     goBack() {

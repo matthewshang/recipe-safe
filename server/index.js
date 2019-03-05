@@ -1,7 +1,17 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
 const port = 3000
+const data = require('./entries.json')
 
-app.get('/', (req, res) => res.send('Hello World!'))
+app.use(cors())
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+app.get('/api/entries', function(req, res) {
+  res.json(data.entries)
+})
+
+app.listen(port, () => {
+    console.log(`Server listening on port ${port}!`)
+    console.log(`entries:`)
+    console.log(data.entries)
+})
