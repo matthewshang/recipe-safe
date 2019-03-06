@@ -35,6 +35,8 @@ export default {
 <style>
 .home-recipe-card {
   text-align:center;
+  margin: 0 auto;
+  width: 100%;
 }
 .card-descrip {
   font-size:100%;

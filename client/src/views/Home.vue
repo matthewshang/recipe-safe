@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-container id="top-bar-container" class="my-3 mx-auto d-flex">
+    <b-container id="top-bar-container" class="my-3 pl-0 pr-2 d-flex">
       <b-form-input
         v-model="query"
         type="search"
@@ -8,14 +8,15 @@
         id="top-search-box"
         class="mr-2"
       />
-      <b-button id="new-recipe-button">+</b-button>
+      <b-button variant="outline-primary" id="new-recipe-button">+</b-button>
     </b-container>
+
     <b-container>
       <b-row v-for="i in rowCount" :key="i" no-gutter>
         <b-col
           v-for="(entry, index) in entries.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
           :key="entry.slug + '_' + index"
-          class="m-0 col-xs-4 grid-cols"
+          class="my-1 mx-0 px-1 col-xs-4 grid-cols"
         >
           <home-recipe-card :entry="entry"></home-recipe-card>
         </b-col>
@@ -68,6 +69,7 @@ export default {
 }
 
 #top-bar-container {
+  width: 100%;
 }
 
 #new-recipe-button {
