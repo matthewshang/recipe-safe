@@ -15,21 +15,27 @@
       id="modal-entry" 
       ref="modal"
       title="New Entry"
-      @ok="onOk"
-      @shown="onReset"
+      @ok="onModalOk"
+      @shown="resetForm"
     >
       <b-nav justified pills class="mb-3">
-        <b-nav-item active class="mx-auto">Manual Entry</b-nav-item>
-        <b-nav-item class="mx-auto">From URL</b-nav-item>
+        <b-nav-item :active="tab === 'manual'" @click="tab = 'manual'" class="mx-auto">Manual Entry</b-nav-item>
+        <b-nav-item :active="tab === 'url'" @click="tab = 'url'" class="mx-auto">From URL</b-nav-item>
       </b-nav>
 
-      <b-form @submit.stop.prevent="onOk" @reset="onReset">
+      <b-form v-if="tab === 'manual'" @submit.stop.prevent="onModalOk" @reset="resetForm">
         <b-form-group label="Name of recipe:">
-          <b-form-input type="text" v-model="form.name" required placeholder="Enter name"/>
+          <b-form-input type="text" v-model="form.manual.name" required placeholder="Enter name"/>
         </b-form-group>
 
         <b-form-group label="Description:">
-          <b-form-input type="text" v-model="form.description" placeholder="Describe the recipe. This is optional."/>
+          <b-form-input type="text" v-model="form.manual.desc" placeholder="Describe the recipe. This is optional."/>
+        </b-form-group>
+      </b-form>
+
+      <b-form v-if="tab === 'url'" @submit.stop.prevent="onModalOk" @reset="resetForm">
+        <b-form-group label="Recipe URL:">
+          <b-form-input type="url" v-model="form.url.url" placeholder="URL"/>
         </b-form-group>
       </b-form>
     </b-modal>
@@ -64,9 +70,15 @@ export default {
       itemsPerRow: 3,
       query: '',
       form: {
-        name: '',
-        description: ''
-      }
+        manual: {
+          name: '',
+          description: ''
+        },
+        url: {
+          url: ''
+        }
+      },
+      tab: 'manual'
     };
   },
   created() {
@@ -82,25 +94,26 @@ export default {
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     },
-    onOk(event) {
+    onModalOk(event) {
       event.preventDefault()
-      if (!this.form.name) {
-        alert('Please enter the name of the recipe')
+      if (!this.form.manual.name && !this.form.url.url) {
+        alert(`Please enter the ${this.tab === 'manual' ? 'name' : 'url'} of the recipe`)
       } else {
-        this.submit()
+        this.submitForm()
       }
     },
-    submit() {
-      alert(JSON.stringify(this.form))
+    submitForm() {
+      alert(JSON.stringify(this.form[this.tab]))
       this.$nextTick(() => {
         this.$refs.modal.hide()
       })
     },
-    onReset(event) {
+    resetForm(event) {
       event.preventDefault()
 
-      this.form.name = ''
-      this.form.description = ''
+      this.form.manual.name = ''
+      this.form.manual.description = ''
+      this.form.url.url = ''
     }
   }
 };
