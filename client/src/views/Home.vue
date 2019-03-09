@@ -72,7 +72,7 @@ export default {
       form: {
         manual: {
           name: '',
-          description: ''
+          desc: ''
         },
         url: {
           url: ''
@@ -82,7 +82,7 @@ export default {
     };
   },
   created() {
-    Api.get('entries').then(res => (this.entries = res.data));
+    this.refreshEntries()
   },
   computed: {
     rowCount() {
@@ -94,6 +94,9 @@ export default {
     goBack() {
       window.history.length > 1 ? this.$router.go(-1) : this.$router.push("/");
     },
+    refreshEntries() {
+      Api.get('entries').then(res => (this.entries = res.data));
+    },
     onModalOk(event) {
       event.preventDefault()
       if (!this.form.manual.name && !this.form.url.url) {
@@ -103,7 +106,9 @@ export default {
       }
     },
     submitForm() {
-      alert(JSON.stringify(this.form[this.tab]))
+      // alert(JSON.stringify(this.form[this.tab]))
+      Api.post('entries', this.form.manual)
+      this.refreshEntries()
       this.$nextTick(() => {
         this.$refs.modal.hide()
       })
@@ -112,7 +117,7 @@ export default {
       event.preventDefault()
 
       this.form.manual.name = ''
-      this.form.manual.description = ''
+      this.form.manual.desc= ''
       this.form.url.url = ''
     }
   }

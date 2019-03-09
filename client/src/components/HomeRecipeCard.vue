@@ -9,7 +9,7 @@
         <h4>{{ entry.name }}</h4>
       </b-link>
       <b-card-text class="card-descrip">
-        This is a description of the recipe.
+        {{ entry.desc }}
       </b-card-text>
     </b-card-body>
   </b-card>
