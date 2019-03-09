@@ -45,7 +45,7 @@
         <b-col
           v-for="(entry, index) in entries.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
           :key="entry.slug + '_' + index"
-          class="my-1 mx-0 px-1 col-xs-4 grid-cols"
+          class="my-1 mx-0 px-1 col-xs-3 grid-cols"
         >
           <home-recipe-card :entry="entry"></home-recipe-card>
         </b-col>
@@ -67,7 +67,7 @@ export default {
     return {
       page_title: 'Home',
       entries: null,
-      itemsPerRow: 3,
+      itemsPerRow: 4,
       query: '',
       form: {
         manual: {
@@ -86,8 +86,8 @@ export default {
   },
   computed: {
     rowCount() {
-      if (this.entries === null) return 0;
-      return Math.ceil(this.entries.length / this.itemsPerRow);
+      if (this.entries === null) return 0
+      return Math.ceil(this.entries.length / this.itemsPerRow)
     }
   },
   methods: {
@@ -126,7 +126,7 @@ export default {
 
 <style>
 .grid-cols {
-  max-width: 33%;
+  max-width: 25%;
 }
 
 #top-search-box {

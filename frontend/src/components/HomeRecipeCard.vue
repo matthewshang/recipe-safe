@@ -1,12 +1,12 @@
 <template>
   <b-card
     no-body
-    :img-src="require(`@/assets/images/friedrice.jpg`)"
-    class="m-0 border border-primary home-recipe-card"
+    class="m-0 h-100 border border-primary home-recipe-card"
   >
-    <b-card-body>
+    <b-card-img :src="require(`@/assets/images/friedrice.jpg`)" bottom class="card-img-top"/>
+    <b-card-body class="pt-3">
       <b-link :to="'/entries/' + entry.slug">
-        <h4>{{ entry.name }}</h4>
+        <h6>{{ entry.name }}</h6>
       </b-link>
       <b-card-text class="card-descrip">
         {{ entry.desc }}
@@ -38,8 +38,15 @@ export default {
   margin: 0 auto;
   width: 100%;
 }
+
 .card-descrip {
-  font-size:100%;
+  font-size:90%;
   text-align:left;
+}
+
+.card-img-top {
+  width: 100%;
+  height: 10vw;
+  object-fit: cover;
 }
 </style>
