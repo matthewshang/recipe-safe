@@ -3,8 +3,9 @@
     <div v-if="loading" class="loading">
       Loading...
     </div>
-    <div v-if="entry" class="content">
+    <div v-if="entry" class="entry-content">
       <h2>{{ entry.name }}</h2>
+      <p>{{ entry.desc }}</p>
     </div>
   </div>
 </template>

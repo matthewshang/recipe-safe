@@ -1,41 +1,68 @@
 const express = require('express')
 const cors = require('cors')
 const slugify = require('slugify')
-const fs = require('fs')
+const mongoose = require('mongoose')
+
 const app = express()
 const port = 3000
-const data = require('./entries.json')
+
+mongoose.connect('mongodb://localhost:27017/entries', { useNewUrlParser: true })
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error:'))
+db.once('open', () => {
+  console.log('Connected to db!')
+
+  const entrySchema = new mongoose.Schema({
+    name: String,
+    desc: String,
+    slug: String
+  })
+  const Entry = mongoose.model('Entry', entrySchema)
+})
 
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
-app.get('/api/entries', function (req, res) {
-  res.json(data.entries)
+app.get('/api/entries', (req, res) => {
+  const Entry = mongoose.model('Entry')
+  const query = Entry.find({}, 'name desc slug', (err, entries) => {
+    if (err) return next(err)
+    res.send(entries)
+  })
 })
 
-app.get('/api/entries/:slug', function (req, res) {
-  const entry = data.entries.filter(e => e.slug === req.params.slug)
-  if (entry.length === 0) {
-    res.status(400).send({ message: 'Bad entry request' })
-  } else {
-    res.json(entry[0])
-  }
+app.get('/api/entries/:slug', (req, res) => {
+  const Entry = mongoose.model('Entry')
+  Entry.findOne({ 'slug': req.params.slug }, 'name desc', (err, entry) => {
+    if (err) return next(err)
+    if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
+    else res.send(entry)
+  })
 })
 
-app.post('/api/entries', function(req, res) {
+app.post('/api/entries', (req, res) => {
   const name = req.body.name,
         desc = req.body.desc
+  const Entry = mongoose.model('Entry')
   
-  const entry = {slug: slugify(name, {lower: true}), name: name, desc: desc}
-  data.entries.push(entry)
-  fs.writeFile('entries.json', JSON.stringify(data, null, 2), 'utf8', (err) => {
-    if (err) return console.log(err)
-    console.log(`Wrote ${JSON.stringify(entry)}`) })
+  const entry = new Entry({
+    slug: slugify(name, {lower: true}),
+    name: name,
+    desc: desc
+  })
+  entry.save((err, e) => {
+    if (err) return console.error(err)
+    console.log(`Saved ${e} to db`)
+  })
+})
+
+app.use((err, req, res, next) => {
+  console.error(err)
+  res.status(500)
+  res.send('Something went wrong.')
 })
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}!`)
-  console.log(`entries:`)
-  console.log(data.entries)
 })
