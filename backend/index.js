@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const slugify = require('slugify')
 const mongoose = require('mongoose')
+const shortid = require('shortid')
 
 const app = express()
 const port = 3000
@@ -55,6 +56,16 @@ app.post('/api/entries', (req, res) => {
     if (err) return console.error(err)
     console.log(`Saved ${e} to db`)
   })
+})
+
+app.post('/api/backup', (req, res) => {
+  const url = req.body.url
+  console.log(`Received url ${url} to back up`)
+
+  res.status(202)
+  res.header('Location', `queue/${shortid.generate()}`)
+  res.set('Access-Control-Expose-Headers', 'Location')
+  res.end()
 })
 
 app.use((err, req, res, next) => {

@@ -35,7 +35,7 @@
 
       <b-form v-if="tab === 'url'" @submit.stop.prevent="onModalOk" @reset="resetForm">
         <b-form-group label="Recipe URL:">
-          <b-form-input type="url" v-model="form.url.url" placeholder="URL"/>
+          <b-form-input type="url" v-model="form.url" placeholder="URL"/>
         </b-form-group>
       </b-form>
     </b-modal>
@@ -74,9 +74,7 @@ export default {
           name: '',
           desc: ''
         },
-        url: {
-          url: ''
-        }
+        url: ''
       },
       tab: 'manual'
     };
@@ -99,7 +97,7 @@ export default {
     },
     onModalOk(event) {
       event.preventDefault()
-      if (!this.form.manual.name && !this.form.url.url) {
+      if (!this.form.manual.name && !this.form.url) {
         alert(`Please enter the ${this.tab === 'manual' ? 'name' : 'url'} of the recipe`)
       } else {
         this.submitForm()
@@ -107,8 +105,13 @@ export default {
     },
     submitForm() {
       // alert(JSON.stringify(this.form[this.tab]))
-      Api.post('entries', this.form.manual)
-      this.refreshEntries()
+      if (this.tab === 'manual') {
+        Api.post('entries', this.form.manual)
+        this.refreshEntries()
+      } else {
+        Api.post('backup', { url: this.form.url })
+          .then(res => (window.alert(JSON.stringify(res))))
+      }
       this.$nextTick(() => {
         this.$refs.modal.hide()
       })
@@ -118,7 +121,7 @@ export default {
 
       this.form.manual.name = ''
       this.form.manual.desc= ''
-      this.form.url.url = ''
+      this.form.url = ''
     }
   }
 };
