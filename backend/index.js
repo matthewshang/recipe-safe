@@ -1,11 +1,36 @@
-const express = require('express')
-const cors = require('cors')
-const slugify = require('slugify')
+const cors     = require('cors')
+const express  = require('express')
+const kue      = require('kue')
 const mongoose = require('mongoose')
-const shortid = require('shortid')
+const shortid  = require('shortid')
+const slugify  = require('slugify')
+const webshot  = require('webshot')
 
 const app = express()
 const port = 3000
+
+const queue = kue.createQueue()
+
+function takeScreenshot(data, done) {
+  var isErr = false
+  const path = `screenshots/${data.id}.png`
+  webshot(data.url, path, (err) => {
+    if (err) {
+      console.error(err)
+      isErr = true
+    } else {
+      console.log(`Saved ${data.url} to ${path}`)
+    }
+  })
+
+  if (isErr) return done(new Error('could not take screenshot'))
+  else done()
+}
+
+queue.process('screenshot', (job, done) => {
+  console.log(`Processing job ${JSON.stringify(job.data)}`)
+  takeScreenshot(job.data, done)
+})
 
 mongoose.connect('mongodb://localhost:27017/entries', { useNewUrlParser: true })
 const db = mongoose.connection
@@ -46,7 +71,7 @@ app.post('/api/entries', (req, res) => {
   const name = req.body.name,
         desc = req.body.desc
   const Entry = mongoose.model('Entry')
-  
+
   const entry = new Entry({
     slug: slugify(name, {lower: true}),
     name: name,
@@ -60,10 +85,15 @@ app.post('/api/entries', (req, res) => {
 
 app.post('/api/backup', (req, res) => {
   const url = req.body.url
-  console.log(`Received url ${url} to back up`)
+  const id = shortid.generate()
+
+  const job = queue.create('screenshot', {
+    url: url,
+    id: id
+  }).save()
 
   res.status(202)
-  res.header('Location', `queue/${shortid.generate()}`)
+  res.header('Location', `queue/${id}`)
   res.set('Access-Control-Expose-Headers', 'Location')
   res.end()
 })
