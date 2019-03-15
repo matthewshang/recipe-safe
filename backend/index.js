@@ -2,6 +2,7 @@ const cors     = require('cors')
 const express  = require('express')
 const kue      = require('kue')
 const mongoose = require('mongoose')
+const path     = require('path')
 const shortid  = require('shortid')
 const slugify  = require('slugify')
 const webshot  = require('webshot')
@@ -13,8 +14,8 @@ const queue = kue.createQueue()
 
 function takeScreenshot(data, done) {
   var isErr = false
-  const path = `screenshots/${data.id}.png`
-  webshot(data.url, path, (err) => {
+  const path = `images/${data.id}.png`
+  webshot(data.url, path, { shotSize: { width: 1024, height: 'all' }}, (err) => {
     if (err) {
       console.error(err)
       isErr = true
@@ -41,7 +42,8 @@ db.once('open', () => {
   const entrySchema = new mongoose.Schema({
     name: String,
     desc: String,
-    slug: String
+    slug: String,
+    imageId: String
   })
   const Entry = mongoose.model('Entry', entrySchema)
 })
@@ -49,6 +51,7 @@ db.once('open', () => {
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+// app.use(express.static('images'))
 
 app.get('/api/entries', (req, res) => {
   const Entry = mongoose.model('Entry')
@@ -75,7 +78,8 @@ app.post('/api/entries', (req, res) => {
   const entry = new Entry({
     slug: slugify(name, {lower: true}),
     name: name,
-    desc: desc
+    desc: desc,
+    imageId: shortid.generate()
   })
   entry.save((err, e) => {
     if (err) return console.error(err)
@@ -84,18 +88,41 @@ app.post('/api/entries', (req, res) => {
 })
 
 app.post('/api/backup', (req, res) => {
-  const url = req.body.url
+  const name = req.body.name,
+        url = req.body.url,
+        desc = req.body.desc
   const id = shortid.generate()
 
   const job = queue.create('screenshot', {
+    title: name,
     url: url,
     id: id
   }).save()
+
+  const entry = new mongoose.model('Entry')({
+    slug: slugify(name, {lower: true}),
+    name: name,
+    desc: req.body.desc,
+    imageId: id
+  })
+  entry.save((err, e) => {
+    if (err) return console.error(err)
+    console.log(`Saved ${e} to db`)
+  })
 
   res.status(202)
   res.header('Location', `queue/${id}`)
   res.set('Access-Control-Expose-Headers', 'Location')
   res.end()
+})
+
+app.get('/api/queue/:id', (req, res) => {
+  const id = req.params.id
+})
+
+app.get('/api/images/:id', (req, res) => {
+  const id = req.params.id
+  res.sendFile(path.join(__dirname, './images', id + '.png'))
 })
 
 app.use((err, req, res, next) => {
