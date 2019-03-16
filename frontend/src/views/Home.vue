@@ -23,19 +23,17 @@
         <b-nav-item :active="tab === 'url'" @click="tab = 'url'" class="mx-auto">From URL</b-nav-item>
       </b-nav>
 
-      <b-form v-if="tab === 'manual'" @submit.stop.prevent="onModalOk" @reset="resetForm">
+      <b-form @submit.stop.prevent="onModalOk" @reset="resetForm">
         <b-form-group label="Name of recipe:">
-          <b-form-input type="text" v-model="form.manual.name" required placeholder="Enter name"/>
+          <b-form-input type="text" v-model="form.name" required placeholder="Enter name"/>
+        </b-form-group>
+
+        <b-form-group v-if="tab === 'url'" label="Recipe URL:">
+          <b-form-input type="url" v-model="form.url" placeholder="URL"/>
         </b-form-group>
 
         <b-form-group label="Description:">
-          <b-form-input type="text" v-model="form.manual.desc" placeholder="Describe the recipe. This is optional."/>
-        </b-form-group>
-      </b-form>
-
-      <b-form v-if="tab === 'url'" @submit.stop.prevent="onModalOk" @reset="resetForm">
-        <b-form-group label="Recipe URL:">
-          <b-form-input type="url" v-model="form.url" placeholder="URL"/>
+          <b-form-input type="text" v-model="form.desc" placeholder="Describe the recipe. This is optional."/>
         </b-form-group>
       </b-form>
     </b-modal>
@@ -70,10 +68,8 @@ export default {
       itemsPerRow: 4,
       query: '',
       form: {
-        manual: {
-          name: '',
-          desc: ''
-        },
+        name: '',
+        desc: '',
         url: ''
       },
       tab: 'manual'
@@ -97,30 +93,27 @@ export default {
     },
     onModalOk(event) {
       event.preventDefault()
-      if (!this.form.manual.name && !this.form.url) {
+      if (!this.form.name && !this.form.url) {
         alert(`Please enter the ${this.tab === 'manual' ? 'name' : 'url'} of the recipe`)
       } else {
         this.submitForm()
       }
     },
     submitForm() {
-      // alert(JSON.stringify(this.form[this.tab]))
-      if (this.tab === 'manual') {
-        Api.post('entries', this.form.manual)
-        this.refreshEntries()
-      } else {
-        Api.post('backup', { url: this.form.url })
-          .then(res => (window.alert(JSON.stringify(res))))
-      }
-      this.$nextTick(() => {
-        this.$refs.modal.hide()
-      })
+      Api.post('entries', this.form)
+        .then((res) => {
+          const slug = res.headers.slug
+          this.$nextTick(() => {
+            this.$refs.modal.hide()
+          })
+          this.$router.push({ name: 'Entry', params: { slug }})
+        })
     },
     resetForm(event) {
       event.preventDefault()
 
-      this.form.manual.name = ''
-      this.form.manual.desc= ''
+      this.form.name = ''
+      this.form.desc= ''
       this.form.url = ''
     }
   }

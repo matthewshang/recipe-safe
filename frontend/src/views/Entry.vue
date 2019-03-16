@@ -1,12 +1,20 @@
 <template>
-  <div class="entry">
-    <div v-if="loading" class="loading">
+  <div> 
+    <div v-if="loading" id="loading">
       Loading...
     </div>
-    <div v-if="entry" class="entry-content">
-      <h2>{{ entry.name }}</h2>
+    <b-container v-if="entry" id="entry-content">
+      <h4>{{ entry.name }}</h4>
       <p>{{ entry.desc }}</p>
-    </div>
+      <div v-if="hasImage()" class="d-flex justify-content-center">
+        <b-spinner v-if="imageLoading" 
+          label="Loading image..."/> 
+        <b-img v-else
+          :src="getImgUrl()" alt="Screenshot of recipe" 
+          center
+          />
+      </div>
+    </b-container>
   </div>
 </template>
 
@@ -18,6 +26,7 @@ export default {
   data () {
     return {
       loading: false,
+      imageLoading: true,
       entry: null
     };
   },
@@ -30,6 +39,7 @@ export default {
   methods: {
     fetchData () {
       this.entry = null
+      this.imageLoading = true
       this.loading = true
 
       const slug = this.$route.params.slug
@@ -37,15 +47,38 @@ export default {
       Api.get('entries/' + slug)
         .then((res) => {
           this.entry = res.data
+          if (this.hasImage()) {
+            this.refreshUntilImageExists()
+          }
         })
-        .catch((err) => {
-          console.log(err)
+        .catch(() => {
           this.$router.replace('/not-found')
         })
+    },
+    hasImage () {
+      return !!this.entry.imageId
+    },
+    refreshUntilImageExists () {
+      Api.get('imagestatus/' + this.entry.imageId)
+        .then(() => {
+          this.imageLoading = false
+        })
+        .catch(() => {
+          setTimeout(() => {
+            this.refreshUntilImageExists()
+          }, 500)
+        })
+    },
+    getImgUrl () {
+      return "http://localhost:3000/api/images/" + this.entry.imageId
     }
   }
 };
 </script>
 
 <style>
+#entry-content > p {
+  text-align: left;
+  font-size: 14pt;
+}
 </style>

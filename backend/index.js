@@ -1,5 +1,6 @@
 const cors     = require('cors')
 const express  = require('express')
+const fs       = require('fs')
 const kue      = require('kue')
 const mongoose = require('mongoose')
 const path     = require('path')
@@ -63,7 +64,7 @@ app.get('/api/entries', (req, res) => {
 
 app.get('/api/entries/:slug', (req, res) => {
   const Entry = mongoose.model('Entry')
-  Entry.findOne({ 'slug': req.params.slug }, 'name desc', (err, entry) => {
+  Entry.findOne({ 'slug': req.params.slug }, (err, entry) => {
     if (err) return next(err)
     if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
     else res.send(entry)
@@ -72,57 +73,54 @@ app.get('/api/entries/:slug', (req, res) => {
 
 app.post('/api/entries', (req, res) => {
   const name = req.body.name,
-        desc = req.body.desc
-  const Entry = mongoose.model('Entry')
-
-  const entry = new Entry({
-    slug: slugify(name, {lower: true}),
-    name: name,
-    desc: desc,
-    imageId: shortid.generate()
-  })
-  entry.save((err, e) => {
-    if (err) return console.error(err)
-    console.log(`Saved ${e} to db`)
-  })
-})
-
-app.post('/api/backup', (req, res) => {
-  const name = req.body.name,
         url = req.body.url,
         desc = req.body.desc
-  const id = shortid.generate()
+  const Entry = mongoose.model('Entry')
+  const slug = slugify(name, {lower: true})
+  const id = url ? shortid.generate() : ''
 
-  const job = queue.create('screenshot', {
-    title: name,
-    url: url,
-    id: id
-  }).save()
+  if (url) {
+    const job = queue.create('screenshot', {
+      title: name,
+      url: url,
+      id: id
+    }).save()
+  }
 
-  const entry = new mongoose.model('Entry')({
-    slug: slugify(name, {lower: true}),
+  const entry = new Entry({
+    slug: slug,
     name: name,
-    desc: req.body.desc,
-    imageId: id
+    desc: desc,
+    imageId: id 
   })
   entry.save((err, e) => {
     if (err) return console.error(err)
     console.log(`Saved ${e} to db`)
   })
 
-  res.status(202)
-  res.header('Location', `queue/${id}`)
-  res.set('Access-Control-Expose-Headers', 'Location')
-  res.end()
-})
-
-app.get('/api/queue/:id', (req, res) => {
-  const id = req.params.id
+  res.header('slug', slug)
+    .set('Access-Control-Expose-Headers', 'slug')
+    .end()
 })
 
 app.get('/api/images/:id', (req, res) => {
   const id = req.params.id
-  res.sendFile(path.join(__dirname, './images', id + '.png'))
+  const p = path.join(__dirname, './images', id + '.png')
+  if (fs.existsSync(p)) {
+    res.sendFile(p)
+  } else {
+    res.status(404).end()
+  }
+})
+
+app.get('/api/imagestatus/:id', (req, res) => {
+  const id = req.params.id
+  const p = path.join(__dirname, './images', id + '.png')
+  if (fs.existsSync(p)) {
+    res.status(200).end()
+  } else {
+    res.status(404).end()
+  }
 })
 
 app.use((err, req, res, next) => {
