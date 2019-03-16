@@ -59,13 +59,14 @@ export default {
     },
     refreshUntilImageExists () {
       Api.get('imagestatus/' + this.entry.imageId)
-        .then(() => {
-          this.imageLoading = false
-        })
-        .catch(() => {
-          setTimeout(() => {
-            this.refreshUntilImageExists()
-          }, 500)
+        .then((res) => {
+          if (res.data.exists) {
+            this.imageLoading = false
+          } else {
+            setTimeout(() => {
+              this.refreshUntilImageExists()
+            }, 500)
+          }
         })
     },
     getImgUrl () {

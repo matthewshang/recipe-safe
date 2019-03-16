@@ -3,7 +3,7 @@
     no-body
     class="m-0 h-100 border border-primary home-recipe-card"
   >
-    <b-card-img :src="require(`@/assets/images/friedrice.jpg`)" bottom class="card-img-top"/>
+    <b-card-img :src="imageUrl" bottom class="card-img-top"/>
     <b-card-body class="pt-3">
       <b-link :to="'/entries/' + entry.slug">
         <h6>{{ entry.name }}</h6>
@@ -16,6 +16,8 @@
 </template>
 
 <script>
+import Api from '../api.js'
+
 export default {
   name: 'HomeRecipeCard',
   props: {
@@ -24,9 +26,26 @@ export default {
       default () {
         return {
           name: 'unknown',
-          slug: 'not-found'
+          slug: 'not-found',
+          imageId: ''
         }
       }
+    }
+  },
+  data () {
+    return {
+      imageUrl: require(`@/assets/images/friedrice.jpg`)
+    }
+  },
+  created () {
+    const id = this.$props.entry.imageId
+    if (id) {
+      Api.get('imagestatus/' + id)
+        .then((res) => {
+          if (res.data.exists) {
+            this.imageUrl =  'http://localhost:3000/api/images/' + id
+          }
+        })
     }
   }
 };

@@ -56,7 +56,7 @@ app.use(express.urlencoded({extended: true}))
 
 app.get('/api/entries', (req, res) => {
   const Entry = mongoose.model('Entry')
-  const query = Entry.find({}, 'name desc slug', (err, entries) => {
+  const query = Entry.find({}, 'name desc slug imageId -_id', (err, entries) => {
     if (err) return next(err)
     res.send(entries)
   })
@@ -64,7 +64,7 @@ app.get('/api/entries', (req, res) => {
 
 app.get('/api/entries/:slug', (req, res) => {
   const Entry = mongoose.model('Entry')
-  Entry.findOne({ 'slug': req.params.slug }, (err, entry) => {
+  Entry.findOne({ 'slug': req.params.slug }, '-_id -__v', (err, entry) => {
     if (err) return next(err)
     if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
     else res.send(entry)
@@ -116,11 +116,7 @@ app.get('/api/images/:id', (req, res) => {
 app.get('/api/imagestatus/:id', (req, res) => {
   const id = req.params.id
   const p = path.join(__dirname, './images', id + '.png')
-  if (fs.existsSync(p)) {
-    res.status(200).end()
-  } else {
-    res.status(404).end()
-  }
+  res.send({ exists: fs.existsSync(p)})
 })
 
 app.use((err, req, res, next) => {
