@@ -63,8 +63,8 @@ db.once('open', () => {
     slug: String,
     imageId: String,
     ingredients: [String],
-    steps: [String]
-  })
+    steps: [String],
+  }, {timestamps: true})
   const Entry = mongoose.model('Entry', entrySchema)
 })
 
@@ -73,7 +73,7 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 app.get('/api/entries', (req, res) => {
-  mongoose.model('Entry').find({}, 'name desc slug imageId -_id', (err, entries) => {
+  mongoose.model('Entry').find({}, 'name desc slug imageId updatedAt createdAt -_id', (err, entries) => {
     if (err) return next(err)
     res.send(entries)
   })

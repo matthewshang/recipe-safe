@@ -6,16 +6,19 @@
     <b-card-img :src="imageUrl" bottom class="card-img-top"/>
     <b-card-body class="pt-3">
       <b-link :to="'/entries/' + entry.slug">
-        <h6>{{ entry.name }}</h6>
+        <h5>{{ entry.name }}</h5>
       </b-link>
-      <b-card-text class="card-descrip">
+      <b-card-text>
         {{ entry.desc }}
       </b-card-text>
     </b-card-body>
+    <b-card-footer>🕐{{ createdAt }}</b-card-footer>
   </b-card>
 </template>
 
 <script>
+const moment = require('moment')
+
 import Api from '../api.js'
 
 export default {
@@ -27,9 +30,18 @@ export default {
         return {
           name: 'unknown',
           slug: 'not-found',
-          imageId: ''
+          imageId: '',
+          updatedAt: ''
         }
       }
+    }
+  },
+  computed: {
+    createdAt () {
+      return moment(this.entry.createdAt).format('MMM Do YY')
+    },
+    updatedAt () {
+      return moment(this.entry.updatedAt).format('MMM Do YY')
     }
   },
   data () {
@@ -53,7 +65,7 @@ export default {
 
 <style>
 .home-recipe-card {
-  text-align:center;
+  text-align: left;
   margin: 0 auto;
   width: 100%;
   box-shadow: rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px;
@@ -64,12 +76,19 @@ export default {
   transform: scale(1.025);
 }
 
-.card-descrip {
-  font-size:90%;
-  text-align:left;
+.home-recipe-card .card-footer {
+  font-size: 12pt;
 }
 
-.card-img-top {
+.home-recipe-card .card-text {
+  text-align: left;
+  font-size: 12pt;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-recipe-card .card-img-top {
   width: 100%;
   height: 10vw;
   object-fit: cover;

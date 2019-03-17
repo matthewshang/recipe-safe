@@ -3,6 +3,9 @@
     <b-container v-if="entry" id="entry-content">
       <h1 class="my-3">{{ entry.name }}</h1>
       <p>{{ entry.desc }}</p>
+      <p>Created: {{ createdAt }}</p>
+      <p>Last edited: {{ editedAt }}</p>
+
       <div v-if="hasImage()" class="d-flex justify-content-center">
         <b-spinner v-if="imageLoading" 
           label="Loading image..."/> 
@@ -50,7 +53,7 @@
       <p v-else>No steps stored.</p>
 
       <h2>Settings</h2>
-      <div class="d-flex">
+      <div class="d-flex mb-4">
         <b-button v-b-modal.modal-delete variant="outline-danger">Delete</b-button>
       </div>
 
@@ -70,6 +73,8 @@
 </template>
 
 <script>
+const moment = require('moment')
+
 import Api from '../api.js'
 
 export default {
@@ -92,6 +97,13 @@ export default {
   computed: {
     deleteState () {
       return this.deleteName === this.entry.name
+    },
+    createdAt() {
+      return moment(this.entry.createdAt).calendar()
+    },
+    editedAt() {
+      return moment(this.entry.updatedAt).fromNow() 
+        + ', ' + moment(this.entry.updatedAt).calendar()
     }
   },
   watch: {
