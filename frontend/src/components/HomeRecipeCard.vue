@@ -1,18 +1,19 @@
 <template>
   <b-card
     no-body
-    class="m-0 h-100 border border-primary home-recipe-card"
+    border-variant="primary"
+    bg-variant="light"
+    class="m-0 h-100 home-recipe-card"
   >
+    <b-link :to="'/entries/' + entry.slug"/>
     <b-card-img :src="imageUrl" bottom class="card-img-top"/>
     <b-card-body class="pt-3">
-      <b-link :to="'/entries/' + entry.slug">
-        <h5>{{ entry.name }}</h5>
-      </b-link>
+      <b-card-title>{{ entry.name }}</b-card-title>
       <b-card-text>
         {{ entry.desc }}
       </b-card-text>
     </b-card-body>
-    <b-card-footer>🕐{{ createdAt }}</b-card-footer>
+    <b-card-footer class="p-2">🕐{{ createdAt }}</b-card-footer>
   </b-card>
 </template>
 
@@ -64,6 +65,16 @@ export default {
 </script>
 
 <style>
+.home-recipe-card > a {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%; width: 100%;
+}
+
+.home-recipe-card h4 {
+  font-size: 15pt;
+}
+
 .home-recipe-card {
   text-align: left;
   margin: 0 auto;
@@ -77,7 +88,7 @@ export default {
 }
 
 .home-recipe-card .card-footer {
-  font-size: 12pt;
+  font-size: 11pt;
 }
 
 .home-recipe-card .card-text {

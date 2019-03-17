@@ -1,0 +1,35 @@
+$white: #fff;
+$black: #000;
+$green: #00e389;
+$blue: #3399ff;
+$orange: #f26c22;
+$yellow: #ffd925;
+$red: #e5001e;
+
+$gray-100: #f8f9fa; 
+$gray-200: #e9ecef; 
+$gray-300: #dee2e6; 
+$gray-400: #ced4da; 
+$gray-500: #adb5bd; 
+$gray-600: #6c757d; 
+$gray-700: #495057; 
+$gray-800: #343a40; 
+$gray-900: #212529; 
+
+// Create grayscale
+$gray-dark: #292b2c;
+$gray: #3f3f3f;
+$gray-light: #7e7e7e;
+$gray-lighter: #ededed;
+$gray-lightest: #fafafa;
+
+// Set brand colors
+$primary: #E27D60;
+$success: $green;
+$info: $yellow;
+$warning: $orange;
+$danger: $red;
+$light: $gray-lightest;
+
+@import '../node_modules/bootstrap/scss/bootstrap.scss';
+@import '../node_modules/bootstrap-vue/src/index.scss';

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-container id="top-bar-container" class="my-3 d-flex">
+    <b-container id="top-bar-container" class="my-5 d-flex">
       <b-input-group prepend="Search" class="mr-2">
         <b-form-input
           v-model="query"
@@ -12,7 +12,11 @@
         <b-dropdown-item @click="sortMode = 'date'">Date</b-dropdown-item>
         <b-dropdown-item @click="sortMode = 'name'">Name</b-dropdown-item>
       </b-dropdown>
-      <b-button v-b-modal.modal-entry v-b-tooltip.hover title="Add entry" variant="outline-primary" id="new-recipe-button">+</b-button>
+      <b-button 
+        v-b-modal.modal-entry 
+        v-b-tooltip.hover title="Add entry" 
+        variant="outline-primary" 
+        id="new-recipe-button">+</b-button>
     </b-container>
 
     <b-modal 
@@ -29,7 +33,7 @@
 
       <b-form @submit.stop.prevent="onModalOk" @reset="resetForm">
         <b-form-group label="Name of recipe:">
-          <b-form-input type="text" v-model="form.name" required placeholder="Enter name"/>
+          <b-form-input type="text" v-model="form.name" :state="lengthState" required placeholder="Enter name"/>
         </b-form-group>
 
         <b-form-group v-if="tab === 'url'" label="Recipe URL:">
@@ -42,7 +46,7 @@
       </b-form>
     </b-modal>
 
-    <b-container>
+    <b-container class="mt-5">
       <b-row v-for="i in rowCount" :key="i" no-gutter>
         <b-col
           v-for="(entry, index) in filteredList.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
@@ -102,11 +106,15 @@ export default {
       const sortByDate = ((a, b) => {
         return new Date(a.createdAt) - new Date(b.createdAt)
       })
+
       return this.entries
       .filter((entry) => {
         return entry.name.toLowerCase().includes(this.query.toLowerCase())
       })
       .sort(this.sortMode === 'name' ? sortByName : sortByDate)
+    },
+    lengthState() {
+      return this.form.name.length && this.form.name.length <= 25 ? true : false
     }
   },
   methods: {
@@ -155,6 +163,7 @@ export default {
 </script>
 
 <style>
+
 .grid-cols {
   max-width: 25%;
 }
