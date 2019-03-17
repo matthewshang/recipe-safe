@@ -49,6 +49,22 @@
       </div>
       <p v-else>No steps stored.</p>
 
+      <h2>Settings</h2>
+      <div class="d-flex">
+        <b-button v-b-modal.modal-delete variant="outline-danger">Delete</b-button>
+      </div>
+
+      <b-modal id="modal-delete" ref="modal" title="Delete Entry" @ok="handleOk" @shown="clearDelete">
+        <p>This action cannot be undone. Type "{{ entry.name }}" to confirm.</p>
+        <b-form-input
+          v-model="deleteName"
+          type="text"
+          :state="deleteState"
+          placeholder="Enter the entry's name"
+        />
+        <p v-show="warnDelete">Ensure that you have typed the entry's name correctly.</p>
+      </b-modal>
+
     </b-container>
   </div>
 </template>
@@ -62,7 +78,8 @@ export default {
     return {
       imageLoading: true,
       entry: null,
-      contentsChanged: false,
+      deleteName: '',
+      warnDelete: false,
       showAddIngre: false,
       ingredient: '',
       showAddStep: false,
@@ -71,6 +88,11 @@ export default {
   },
   created () {
     this.fetchData()
+  },
+  computed: {
+    deleteState () {
+      return this.deleteName === this.entry.name
+    }
   },
   watch: {
     '$route': 'fetchData'
@@ -114,7 +136,7 @@ export default {
       this.showAddIngre = false
       if (this.ingredient) {
         this.entry.ingredients.push(this.ingredient)
-        Api.post('entries/' + this.entry.slug, { ingredient: this.ingredient })
+        Api.post('entries/update/' + this.entry.slug, { ingredient: this.ingredient })
       }
       this.ingredient = ''
     },
@@ -122,9 +144,22 @@ export default {
       this.showAddStep = false
       if (this.step) {
         this.entry.steps.push(this.step)
-        Api.post('entries/' + this.entry.slug, { step: this.step })
+        Api.post('entries/update/' + this.entry.slug, { step: this.step })
       }
       this.step = ''
+    },
+    handleOk(e) {
+      e.preventDefault()
+      if (this.deleteName !== this.entry.name) {
+        this.warnDelete = true
+      } else {
+        Api.post('entries/delete/' + this.entry.slug)
+        this.$router.replace('/')
+      }
+    },
+    clearDelete() {
+      this.warnDelete = false
+      this.deleteName = ''
     }
   }
 };

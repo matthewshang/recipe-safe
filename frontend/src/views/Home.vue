@@ -1,15 +1,12 @@
 <template>
   <div>
-    <b-container id="top-bar-container" class="my-3 pl-0 pr-2 d-flex">
-      <b-input-group prepend="Search" class="mr-4">
+    <b-container id="top-bar-container" class="my-3 d-flex">
+      <b-input-group prepend="Search" class="mr-2">
         <b-form-input
           v-model="query"
           type="search"
           id="top-search-box"
         />
-        <b-input-group-append>
-          <b-button variant="outline-secondary">Clear</b-button>
-        </b-input-group-append>
       </b-input-group>
       <b-button v-b-modal.modal-entry variant="outline-primary" id="new-recipe-button">+</b-button>
     </b-container>
@@ -80,6 +77,10 @@ export default {
   },
   created() {
     this.refreshEntries()
+  },
+  beforeRouteUpdate (to, from, next) {
+    this.refreshEntries()
+    next()
   },
   computed: {
     rowCount() {

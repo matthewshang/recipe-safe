@@ -126,7 +126,7 @@ app.get('/api/entries/:slug', (req, res) => {
   })
 })
 
-app.post('/api/entries/:slug', (req, res) => {
+app.post('/api/entries/update/:slug', (req, res) => {
   const slug = req.params.slug
   const query = { 'slug': slug }
   const update = { '$push': {}}
@@ -137,6 +137,14 @@ app.post('/api/entries/:slug', (req, res) => {
   mongoose.model('Entry').findOneAndUpdate(query, update, (err) => {
     if (err) console.log(err)
     else console.log(`Updated entry at ${slug}`)
+  })
+})
+
+app.post('/api/entries/delete/:slug', (req, res) => {
+  const slug = req.params.slug
+  mongoose.model('Entry').deleteOne({ slug: slug }, (err) => {
+    if (err) console.log(err)
+    else console.log(`Deleted entry at ${slug}`)
   })
 })
 
