@@ -62,6 +62,7 @@ export default {
     return {
       imageLoading: true,
       entry: null,
+      contentsChanged: false,
       showAddIngre: false,
       ingredient: '',
       showAddStep: false,
@@ -111,12 +112,18 @@ export default {
     },
     addIngredient() {
       this.showAddIngre = false
-      if (this.ingredient) this.entry.ingredients.push(this.ingredient)
+      if (this.ingredient) {
+        this.entry.ingredients.push(this.ingredient)
+        Api.post('entries/' + this.entry.slug, { ingredient: this.ingredient })
+      }
       this.ingredient = ''
     },
     addStep() {
       this.showAddStep = false
-      if (this.step) this.entry.steps.push(this.step)
+      if (this.step) {
+        this.entry.steps.push(this.step)
+        Api.post('entries/' + this.entry.slug, { step: this.step })
+      }
       this.step = ''
     }
   }

@@ -79,14 +79,6 @@ app.get('/api/entries', (req, res) => {
   })
 })
 
-app.get('/api/entries/:slug', (req, res) => {
-  mongoose.model('Entry').findOne({ 'slug': req.params.slug }, '-_id -__v', (err, entry) => {
-    if (err) return next(err)
-    if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
-    else res.send(entry)
-  })
-})
-
 app.post('/api/entries', (req, res) => {
   const name = req.body.name,
         url = req.body.url,
@@ -124,6 +116,28 @@ app.post('/api/entries', (req, res) => {
   res.header('slug', slug)
     .set('Access-Control-Expose-Headers', 'slug')
     .end()
+})
+
+app.get('/api/entries/:slug', (req, res) => {
+  mongoose.model('Entry').findOne({ 'slug': req.params.slug }, '-_id -__v', (err, entry) => {
+    if (err) return next(err)
+    if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
+    else res.send(entry)
+  })
+})
+
+app.post('/api/entries/:slug', (req, res) => {
+  const slug = req.params.slug
+  const query = { 'slug': slug }
+  const update = { '$push': {}}
+  if (req.body.ingredient) update.$push.ingredients = req.body.ingredient
+  if (req.body.step) update.$push.steps = req.body.step
+  console.log(JSON.stringify(update))
+
+  mongoose.model('Entry').findOneAndUpdate(query, update, (err) => {
+    if (err) console.log(err)
+    else console.log(`Updated entry at ${slug}`)
+  })
 })
 
 app.get('/api/images/:id', (req, res) => {
