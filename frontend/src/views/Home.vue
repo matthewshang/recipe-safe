@@ -1,13 +1,16 @@
 <template>
   <div>
     <b-container id="top-bar-container" class="my-3 pl-0 pr-2 d-flex">
-      <b-form-input
-        v-model="query"
-        type="search"
-        placeholder="Search for a recipe"
-        id="top-search-box"
-        class="mr-2"
-      />
+      <b-input-group prepend="Search" class="mr-4">
+        <b-form-input
+          v-model="query"
+          type="search"
+          id="top-search-box"
+        />
+        <b-input-group-append>
+          <b-button variant="outline-secondary">Clear</b-button>
+        </b-input-group-append>
+      </b-input-group>
       <b-button v-b-modal.modal-entry variant="outline-primary" id="new-recipe-button">+</b-button>
     </b-container>
 
@@ -41,7 +44,7 @@
     <b-container>
       <b-row v-for="i in rowCount" :key="i" no-gutter>
         <b-col
-          v-for="(entry, index) in entries.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
+          v-for="(entry, index) in filteredList.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
           :key="entry.slug + '_' + index"
           class="my-1 mx-0 px-1 col-xs-3 grid-cols"
         >
@@ -82,6 +85,11 @@ export default {
     rowCount() {
       if (this.entries === null) return 0
       return Math.ceil(this.entries.length / this.itemsPerRow)
+    },
+    filteredList() {
+      return this.entries.filter((entry) => {
+        return entry.name.toLowerCase().includes(this.query.toLowerCase())
+      })
     }
   },
   methods: {
