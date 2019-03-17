@@ -8,15 +8,17 @@ const shortid  = require('shortid')
 const slugify  = require('slugify')
 const webshot  = require('webshot')
 
+const utils = require('./utils.js')
+
 const app = express()
 const port = 3000
 
 const queue = kue.createQueue()
-const imageIdToJobId = {}
+const idMap = {}
 
 kue.Job.range(0, -1, 'desc', (err, jobs) => {
   jobs.forEach((job) => {
-    imageIdToJobId[job.data.id] = job.id
+    idMap[job.data.id] = job.id
   })
 })
 
@@ -33,6 +35,9 @@ function takeScreenshot(data, done) {
   webshot(data.url, path, options, (err) => {
     if (err) {
       console.log(err)
+      mongoose.model('Entry').findOneAndUpdate({ imageId: data.id }, { imageId: '' }, (er) => {
+        if (er) console.log(er)
+      })
       return done(new Error('could not take screenshot'))
     } else {
       console.log(`Saved ${data.url} to ${path}`)
@@ -66,16 +71,14 @@ app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 
 app.get('/api/entries', (req, res) => {
-  const Entry = mongoose.model('Entry')
-  const query = Entry.find({}, 'name desc slug imageId -_id', (err, entries) => {
+  mongoose.model('Entry').find({}, 'name desc slug imageId -_id', (err, entries) => {
     if (err) return next(err)
     res.send(entries)
   })
 })
 
 app.get('/api/entries/:slug', (req, res) => {
-  const Entry = mongoose.model('Entry')
-  Entry.findOne({ 'slug': req.params.slug }, '-_id -__v', (err, entry) => {
+  mongoose.model('Entry').findOne({ 'slug': req.params.slug }, '-_id -__v', (err, entry) => {
     if (err) return next(err)
     if (!entry) res.status(400).send({ 'error': 'Bad entry request' })
     else res.send(entry)
@@ -86,27 +89,30 @@ app.post('/api/entries', (req, res) => {
   const name = req.body.name,
         url = req.body.url,
         desc = req.body.desc
-  const Entry = mongoose.model('Entry')
   const slug = slugify(name, {lower: true})
-  const id = url ? shortid.generate() : ''
+  let id = url ? shortid.generate() : ''
 
   if (url) {
-    const job = queue.create('screenshot', {
-      title: name,
-      url: url,
-      id: id
-    }).save(() => {
-      imageIdToJobId[id] = job.id
-    })
+    if (utils.isURL(url)) {
+      const job = queue.create('screenshot', {
+        title: name,
+        url: url,
+        id: id
+      }).save(() => {
+        idMap[id] = job.id
+      })
+    } else {
+      id = ''
+    }
   }
 
-  const entry = new Entry({
+  new mongoose.model('Entry')({
     slug: slug,
     name: name,
     desc: desc,
     imageId: id 
   })
-  entry.save((err, e) => {
+  .save((err, e) => {
     if (err) return console.error(err)
     console.log(`Saved ${e} to db`)
   })
@@ -128,7 +134,7 @@ app.get('/api/images/:id', (req, res) => {
 
 app.get('/api/imagestatus/:id', (req, res) => {
   const imageId = req.params.id
-  const id = imageIdToJobId[imageId]
+  const id = idMap[imageId]
   if (id) {
     kue.Job.get(id, (err, job) => {
       if (err) res.status(500).end()

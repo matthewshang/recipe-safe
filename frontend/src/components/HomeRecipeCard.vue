@@ -34,7 +34,7 @@ export default {
   },
   data () {
     return {
-      imageUrl: require(`@/assets/images/friedrice.jpg`)
+      imageUrl: require(`@/assets/images/white.png`)
     }
   },
   created () {
