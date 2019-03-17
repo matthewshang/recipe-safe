@@ -61,7 +61,9 @@ db.once('open', () => {
     name: String,
     desc: String,
     slug: String,
-    imageId: String
+    imageId: String,
+    ingredients: [String],
+    steps: [String]
   })
   const Entry = mongoose.model('Entry', entrySchema)
 })
@@ -110,7 +112,9 @@ app.post('/api/entries', (req, res) => {
     slug: slug,
     name: name,
     desc: desc,
-    imageId: id 
+    imageId: id,
+    ingredients: ['1 egg', '8 cups of flour'],
+    steps: ['Boil a pot of water', 'Eat'] 
   })
   .save((err, e) => {
     if (err) return console.error(err)

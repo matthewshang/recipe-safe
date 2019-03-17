@@ -1,7 +1,7 @@
 <template>
   <div> 
     <b-container v-if="entry" id="entry-content">
-      <h4 class="my-3">{{ entry.name }}</h4>
+      <h1 class="my-3">{{ entry.name }}</h1>
       <p>{{ entry.desc }}</p>
       <div v-if="hasImage()" class="d-flex justify-content-center">
         <b-spinner v-if="imageLoading" 
@@ -12,6 +12,43 @@
             fluid center rounded/>
         </b-container>
       </div>
+
+      <div class="d-flex">
+        <h2>Ingredients</h2>
+        <b-button variant="outline-primary" @click="showAddIngre = !showAddIngre" class="ml-2 h-50">+</b-button>
+        <b-form-input 
+          v-show="showAddIngre" v-model="ingredient" type="text" 
+          placeholder="Enter an ingredient"
+          class="ml-2"
+          @keyup.enter="addIngredient"/>
+      </div>
+      <div v-if="entry.ingredients.length != 0" class="mb-4">
+        <b-list-group>
+          <b-list-group-item v-for="(item, index) in entry.ingredients" :key="index">
+            {{ item }}
+          </b-list-group-item>
+        </b-list-group>      
+      </div>
+      <p v-else>No ingredients stored.</p>
+
+      <div class="d-flex">
+        <h2>Steps</h2>
+        <b-button variant="outline-primary" @click="showAddStep = !showAddStep" class="ml-2 h-50">+</b-button>
+        <b-form-input 
+          v-show="showAddStep" v-model="step" type="text" 
+          placeholder="Enter a step"
+          class="ml-2"
+          @keyup.enter="addStep"/>
+      </div>
+      <div v-if="entry.steps.length != 0" class="mb-4">
+        <ol>
+          <li v-for="(step, index) in entry.steps" :key="index" class="my-2">
+            {{ step }}
+          </li>
+        </ol>
+      </div>
+      <p v-else>No steps stored.</p>
+
     </b-container>
   </div>
 </template>
@@ -24,7 +61,11 @@ export default {
   data () {
     return {
       imageLoading: true,
-      entry: null
+      entry: null,
+      showAddIngre: false,
+      ingredient: '',
+      showAddStep: false,
+      step: ''
     };
   },
   created () {
@@ -67,6 +108,16 @@ export default {
     },
     getImgUrl () {
       return "http://localhost:3000/api/images/" + this.entry.imageId
+    },
+    addIngredient() {
+      this.showAddIngre = false
+      if (this.ingredient) this.entry.ingredients.push(this.ingredient)
+      this.ingredient = ''
+    },
+    addStep() {
+      this.showAddStep = false
+      if (this.step) this.entry.steps.push(this.step)
+      this.step = ''
     }
   }
 };
