@@ -8,7 +8,11 @@
           id="top-search-box"
         />
       </b-input-group>
-      <b-button v-b-modal.modal-entry variant="outline-primary" id="new-recipe-button">+</b-button>
+      <b-dropdown text="Sort by" variant="outline-primary" class="mr-2">
+        <b-dropdown-item @click="sortMode = 'date'">Date</b-dropdown-item>
+        <b-dropdown-item @click="sortMode = 'name'">Name</b-dropdown-item>
+      </b-dropdown>
+      <b-button v-b-modal.modal-entry v-b-tooltip.hover title="Add entry" variant="outline-primary" id="new-recipe-button">+</b-button>
     </b-container>
 
     <b-modal 
@@ -67,6 +71,7 @@ export default {
       entries: null,
       itemsPerRow: 4,
       query: '',
+      sortMode: 'date',
       form: {
         name: '',
         desc: '',
@@ -88,9 +93,20 @@ export default {
       return Math.ceil(this.entries.length / this.itemsPerRow)
     },
     filteredList() {
-      return this.entries.filter((entry) => {
+      const sortByName = ((a, b) => {
+        const nA = a.name.toLowerCase(), nB = b.name.toLowerCase()
+        if (nA < nB) return -1
+        if (nA > nB) return 1
+        return 0
+      })
+      const sortByDate = ((a, b) => {
+        return new Date(a.createdAt) - new Date(b.createdAt)
+      })
+      return this.entries
+      .filter((entry) => {
         return entry.name.toLowerCase().includes(this.query.toLowerCase())
       })
+      .sort(this.sortMode === 'name' ? sortByName : sortByDate)
     }
   },
   methods: {
@@ -124,6 +140,15 @@ export default {
       this.form.name = ''
       this.form.desc= ''
       this.form.url = ''
+    },
+    doSort() {
+      this.entries.sort((a, b) => {
+        if (this.sortMode === 'date') {
+          return new Date(a.createdAt) - new Date(b.createdAt)
+        } else {
+          return a.name.toLowerCase() < b.name.toLowerCase()
+        }
+      })
     }
   }
 };
