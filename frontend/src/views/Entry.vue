@@ -1,7 +1,6 @@
 <template>
   <div> 
-    <p v-if="loading">Loading...</p>
-    <b-container v-else id="entry-content">
+    <b-container v-if="entry" id="entry-content">
       <h4 class="my-3">{{ entry.name }}</h4>
       <p>{{ entry.desc }}</p>
       <div v-if="hasImage()" class="d-flex justify-content-center">
@@ -24,7 +23,6 @@ export default {
   name: 'Entry',
   data () {
     return {
-      loading: true,
       imageLoading: true,
       entry: null
     };
@@ -38,14 +36,12 @@ export default {
   methods: {
     fetchData () {
       this.entry = null
-      this.loading = true
       this.imageLoading = true
 
       const slug = this.$route.params.slug
       Api.get('entries/' + slug)
         .then((res) => {
           this.entry = res.data
-          this.loading = false
           if (this.hasImage()) {
             this.refreshUntilImageExists()
           }

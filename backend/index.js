@@ -12,21 +12,33 @@ const app = express()
 const port = 3000
 
 const queue = kue.createQueue()
+const imageIdToJobId = {}
+
+kue.Job.range(0, -1, 'desc', (err, jobs) => {
+  jobs.forEach((job) => {
+    imageIdToJobId[job.data.id] = job.id
+  })
+})
 
 function takeScreenshot(data, done) {
-  var isErr = false
+  let isErr = false
   const path = `images/${data.id}.png`
-  webshot(data.url, path, { shotSize: { width: 1024, height: 'all' }}, (err) => {
+  const options = {
+    captureSelector: '#articleContent',
+    shotSize: {
+      width: 'window',
+      height: 'all'
+    }
+  }
+  webshot(data.url, path, options, (err) => {
     if (err) {
-      console.error(err)
-      isErr = true
+      console.log(err)
+      return done(new Error('could not take screenshot'))
     } else {
       console.log(`Saved ${data.url} to ${path}`)
+      done()
     }
   })
-
-  if (isErr) return done(new Error('could not take screenshot'))
-  else done()
 }
 
 queue.process('screenshot', (job, done) => {
@@ -52,7 +64,6 @@ db.once('open', () => {
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
-// app.use(express.static('images'))
 
 app.get('/api/entries', (req, res) => {
   const Entry = mongoose.model('Entry')
@@ -84,7 +95,9 @@ app.post('/api/entries', (req, res) => {
       title: name,
       url: url,
       id: id
-    }).save()
+    }).save(() => {
+      imageIdToJobId[id] = job.id
+    })
   }
 
   const entry = new Entry({
@@ -114,9 +127,16 @@ app.get('/api/images/:id', (req, res) => {
 })
 
 app.get('/api/imagestatus/:id', (req, res) => {
-  const id = req.params.id
-  const p = path.join(__dirname, './images', id + '.png')
-  res.send({ exists: fs.existsSync(p)})
+  const imageId = req.params.id
+  const id = imageIdToJobId[imageId]
+  if (id) {
+    kue.Job.get(id, (err, job) => {
+      if (err) res.status(500).end()
+      else res.send({ exists: job.state() === 'complete' })
+    })
+  } else {
+    res.send({ exists: false })
+  }
 })
 
 app.use((err, req, res, next) => {
