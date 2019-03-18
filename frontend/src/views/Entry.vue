@@ -143,7 +143,7 @@ export default {
         })
     },
     getImgUrl () {
-      return "http://localhost:3000/api/images/" + this.entry.imageId
+      return 'http://localhost:3000/api/images/' + this.entry.imageId + '.png'
     },
     addIngredient() {
       this.showAddIngre = false

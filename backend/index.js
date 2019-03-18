@@ -79,6 +79,7 @@ db.once('open', () => {
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use('/api/images', express.static(path.join(__dirname, 'images')))
 
 app.get('/api/entries', (req, res) => {
   mongoose.model('Entry').find({}, 'name desc slug imageId updatedAt createdAt -_id', (err, entries) => {
@@ -154,16 +155,6 @@ app.post('/api/entries/delete/:slug', (req, res) => {
     if (err) console.log(err)
     else console.log(`Deleted entry at ${slug}`)
   })
-})
-
-app.get('/api/images/:id', (req, res) => {
-  const id = req.params.id
-  const p = path.join(__dirname, './images', id + '.png')
-  if (fs.existsSync(p)) {
-    res.sendFile(p)
-  } else {
-    res.status(404).end()
-  }
 })
 
 app.get('/api/imagestatus/:id', (req, res) => {

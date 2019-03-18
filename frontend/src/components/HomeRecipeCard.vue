@@ -65,7 +65,7 @@ export default {
       Api.get('imagestatus/' + id)
         .then((res) => {
           if (res.data.exists) {
-            this.imageUrl =  'http://localhost:3000/api/images/' + id
+            this.imageUrl =  'http://localhost:3000/api/images/' + id + '.png'
           }
         })
     }
