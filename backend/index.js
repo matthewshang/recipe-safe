@@ -69,6 +69,7 @@ db.once('open', () => {
     desc: String,
     slug: String,
     imageId: String,
+    source: String,
     ingredients: [String],
     steps: [String],
   }, {timestamps: true})
@@ -89,29 +90,29 @@ app.get('/api/entries', (req, res) => {
 app.post('/api/entries', (req, res) => {
   const name = req.body.name,
         url = req.body.url,
+        source = req.body.source,
         desc = req.body.desc
   const slug = slugify(name, {lower: true})
-  let id = url ? shortid.generate() : ''
+  const id = shortid.generate()
 
-  if (url) {
-    if (utils.isURL(url)) {
-      const job = queue.create('screenshot', {
-        title: name,
-        url: url,
-        id: id
-      }).save(() => {
-        idMap[id] = job.id
-      })
-    } else {
-      id = ''
-    }
+  let validUrl = false
+  if (url && utils.isURL(url)) {
+    validUrl = true
+    const job = queue.create('screenshot', {
+      title: name,
+      url: url,
+      id: id
+    }).save(() => {
+      idMap[id] = job.id
+    })
   }
 
   new mongoose.model('Entry')({
     slug: slug,
     name: name,
     desc: desc,
-    imageId: id,
+    imageId: validUrl ? id : '',
+    source: validUrl ? url : source, 
     ingredients: ['1 egg', '8 cups of flour'],
     steps: ['Boil a pot of water', 'Eat'] 
   })

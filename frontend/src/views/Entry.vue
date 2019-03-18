@@ -5,6 +5,7 @@
       <p>{{ entry.desc }}</p>
       <p>Created: {{ createdAt }}</p>
       <p>Last edited: {{ editedAt }}</p>
+      <p>Source: {{ entry.source }}</p>
 
       <div v-if="hasImage()" class="d-flex justify-content-center mb-4">
         <b-spinner v-if="imageLoading" 

@@ -36,8 +36,9 @@
           <b-form-input type="text" v-model="form.name" :state="lengthState" required placeholder="Enter name"/>
         </b-form-group>
 
-        <b-form-group v-if="tab === 'url'" label="Recipe URL:">
-          <b-form-input type="url" v-model="form.url" placeholder="URL"/>
+        <b-form-group :label="sourceName">
+          <b-form-input v-if="tab === 'url'" type="url" v-model="form.url" placeholder="URL"/>
+          <b-form-input v-else type="text" v-model="form.source" placeholder="Source"/>
         </b-form-group>
 
         <b-form-group label="Description:">
@@ -82,7 +83,8 @@ export default {
       form: {
         name: '',
         desc: '',
-        url: ''
+        url: '',
+        source: ''
       },
       tab: 'manual'
     };
@@ -118,6 +120,9 @@ export default {
     },
     lengthState() {
       return this.form.name.length && this.form.name.length <= 25 ? true : false
+    },
+    sourceName() {
+      return this.tab === 'manual' ? 'Recipe Source:' : 'Recipe URL'
     }
   },
   methods: {
@@ -151,6 +156,7 @@ export default {
       this.form.name = ''
       this.form.desc= ''
       this.form.url = ''
+      this.form.source = ''
     },
     doSort() {
       this.entries.sort((a, b) => {
