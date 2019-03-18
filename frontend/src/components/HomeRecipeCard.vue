@@ -6,15 +6,16 @@
     class="m-0 h-100 home-recipe-card"
   >
     <b-link :to="'/entries/' + entry.slug"/>
-    <b-card-img :src="imageUrl" bottom class="card-img-top"/>
+    <b-card-img v-if="hasImage" :src="imageUrl" bottom class="card-img-top"/>
     <b-card-body class="pt-3">
-      <b-card-title>{{ entry.name }}</b-card-title>
+      <b-card-title class="text-truncate">{{ entry.name }}</b-card-title>
       <b-card-text>
-        {{ entry.desc }}
+        {{ description }}
       </b-card-text>
     </b-card-body>
     <b-card-footer class="p-2">🕐{{ createdAt }}</b-card-footer>
   </b-card>
+
 </template>
 
 <script>
@@ -43,11 +44,19 @@ export default {
     },
     updatedAt () {
       return moment(this.entry.updatedAt).format('MMM Do YY')
+    },
+    hasImage () {
+      return this.imageUrl !== ''
+    },
+    description () {
+      const s = this.entry.desc
+      const len = this.hasImage ? 25 : 58 
+      return s.substring(0, len) + ((s.length > len) ? '…' : '')
     }
   },
   data () {
     return {
-      imageUrl: require(`@/assets/images/white.png`)
+      imageUrl: ''
     }
   },
   created () {
@@ -94,9 +103,9 @@ export default {
 .home-recipe-card .card-text {
   text-align: left;
   font-size: 12pt;
-  white-space: nowrap;
+  /* white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
+  text-overflow: ellipsis; */
 }
 
 .home-recipe-card .card-img-top {

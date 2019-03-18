@@ -41,17 +41,20 @@
         </b-form-group>
 
         <b-form-group label="Description:">
-          <b-form-input type="text" v-model="form.desc" placeholder="Describe the recipe. This is optional."/>
+          <b-form-textarea 
+            v-model="form.desc" 
+            placeholder="Describe the recipe. This is optional."
+            rows="2" max-rows="4"/>
         </b-form-group>
       </b-form>
     </b-modal>
 
-    <b-container class="mt-5">
+    <b-container class="my-5">
       <b-row v-for="i in rowCount" :key="i" no-gutter>
         <b-col
           v-for="(entry, index) in filteredList.slice((i - 1) * itemsPerRow, i * itemsPerRow)"
           :key="entry.slug + '_' + index"
-          class="my-1 mx-0 px-1 col-xs-3 grid-cols"
+          class="my-1 mx-0 px-1 col-xs-3 d-flex grid-cols"
         >
           <home-recipe-card :entry="entry"></home-recipe-card>
         </b-col>
