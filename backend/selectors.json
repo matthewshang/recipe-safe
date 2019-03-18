@@ -1,0 +1,6 @@
+{
+    "wenxuecity": ".article,.articalContent",
+    "foodnetwork": ".recipe-body",
+    "allrecipes": ".recipe-container-outer",
+    "delish": ".recipe-wrapper"
+}

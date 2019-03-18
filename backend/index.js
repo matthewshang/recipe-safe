@@ -9,6 +9,7 @@ const slugify  = require('slugify')
 const webshot  = require('webshot')
 
 const utils = require('./utils.js')
+const selectors = require('./selectors.json')
 
 const app = express()
 const port = 3000
@@ -26,12 +27,18 @@ function takeScreenshot(data, done) {
   let isErr = false
   const path = `images/${data.id}.png`
   const options = {
-    captureSelector: '#articleContent',
     shotSize: {
       width: 'window',
       height: 'all'
     }
   }
+  for (const key of Object.keys(selectors)) {
+    if (data.url.includes(key)) {
+      options.captureSelector = selectors[key]
+      break
+    }
+  }
+  
   webshot(data.url, path, options, (err) => {
     if (err) {
       console.log(err)
