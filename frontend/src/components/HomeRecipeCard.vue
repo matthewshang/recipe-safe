@@ -8,7 +8,7 @@
     <b-link :to="'/entries/' + entry.slug"/>
     <b-card-img v-if="hasImage" :src="imageUrl" bottom class="card-img-top"/>
     <b-card-body class="pt-3">
-      <b-card-title class="text-truncate">{{ entry.name }}</b-card-title>
+      <b-card-title>{{ entry.name }}</b-card-title>
       <b-card-text>
         {{ description }}
       </b-card-text>

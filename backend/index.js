@@ -114,8 +114,8 @@ app.post('/api/entries', (req, res) => {
     desc: desc,
     imageId: validUrl ? id : '',
     source: validUrl ? url : source, 
-    ingredients: ['1 egg', '8 cups of flour'],
-    steps: ['Boil a pot of water', 'Eat'] 
+    ingredients: [],
+    steps: []
   })
   .save((err, e) => {
     if (err) return console.error(err)
